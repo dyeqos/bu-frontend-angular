@@ -1,0 +1,217 @@
+<main class="container">
+    <div class="mb-4">
+        <h4>
+            <i class="fas fa-money-bill fa-fw me-3"></i> 
+            Gestión de Cuentas
+            <button class="btn btn-primary" type="button" (click)="nuevaCuenta()" data-mdb-toggle="modal" data-mdb-target="#exampleModal">
+                <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+        </h4>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+          <div class="tile">
+            <div class="tile-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>CLIENTE</th>
+                      <th>TIPO DE PRODUCTO</th>
+                      <th>NUMERO DE CUENTA</th>
+                      <th>MONEDA</th>
+                      <th>MONTO</th>
+                      <th>FECHA CREACIÓN</th>
+                      <th>SUCURSAL</th>
+                      <th>OPCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngIf="cuentas">
+                    <tr *ngFor="let cuenta of cuentas.datos">
+                      <th>{{ cuenta.CLIENTE}}</th>
+                      <th>{{ cuenta.PRODUCTO}}</th>
+                      <th>{{ cuenta.NUMERO_CUENTA}}</th>
+                      <th>{{ cuenta.MONEDA}}</th>
+                      <th>{{ cuenta.MONTO}}</th>
+                      <th>{{ cuenta.FECHA_CREACION | date: 'dd/MM/yyyy'}}</th>
+                      <th>{{ cuenta.SUCURSAL}}</th>
+                      <th>
+                        <div class="text-center">
+                            <button class="btn btn-warning btn-sm" (click)="editarCuenta(cuenta.ID_CUENTA)" title="Editar" data-mdb-toggle="modal" data-mdb-target="#exampleModal"><i class="fas fa-pencil-alt"></i></button> 
+                            <button class="btn btn-danger btn-sm" (click)="eliminarCuenta(cuenta.ID_CUENTA)" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <h4 class="text-center" *ngIf="cuentas && cuentas.datos!.length == 0 "> NO HAY REGISTROS </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form 
+          autocomplete="off" 
+          [formGroup]="miformulario" 
+          class="form-horizontal"
+          (ngSubmit)="guardar()"
+        >
+        <div  class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{tituloModal}}</h5>
+          <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+           
+                
+                  <input type="hidden" id="txtId" formControlName="txtId" value="">
+                  <p class="text-primary">Todos los campos (*) son obligatorios.</p>
+
+                      <div *ngIf="personas" class="form-group col-md-12">
+                        <label for="ddpersona" class="form-label">Cliente: (*)</label>
+                        <select class="form-select" 
+                        id="ddpersona" 
+                        formControlName="ddpersona"
+                        >
+                        <option 
+                            *ngFor="let persona of personas.datos" 
+                            value="{{persona.ID_CLIENTE}}"
+                        > {{persona.COMPLETO}} 
+                        </option>
+                        </select>
+                        <span 
+                        class="form-text text-danger"
+                        *ngIf="camposValidos('ddpersona')"
+                        >
+                        Escoja una opción
+                        </span>
+                      </div>
+
+                      <div *ngIf="productos" class="form-group col-md-12">
+                        <label for="ddproducto" class="form-label">Tipo de Producto: (*)</label>
+                        <select class="form-select" 
+                          id="ddproducto" 
+                          formControlName="ddproducto"
+                        >
+                        <option 
+                            *ngFor="let producto of productos.datos" 
+                            value="{{producto.ID_PARAMETRO}}"
+                        > {{producto.NOMBRE}} 
+                        </option>
+                        </select>
+                        <span
+                        class="form-text text-danger"
+                        *ngIf="camposValidos('ddproducto')"
+                        >
+                        Escoja una opción
+                        </span>
+                      </div>
+
+                      <div class="form-group col-md-12">
+                          <label for="txtNumeroCuenta" class="form-label">Numero de Cuenta: (*)</label>
+                          <input class="form-control"
+                            id="txtNumeroCuenta"
+                            formControlName="txtNumeroCuenta"
+                            type="text" 
+                            placeholder=""
+                          >
+                          <span 
+                            class="form-text text-danger"
+                            *ngIf="camposValidos('txtNumeroCuenta')"
+                          >
+                            El valor mínimo es de 3 caracteres
+                          </span>
+                      </div>
+
+                      <div  *ngIf="monedas" class="form-group col-md-12">
+                        <label for="ddMoneda" class="form-label">Tipo de Moneda: (*)</label>
+                        <select class="form-select" 
+                          id="ddMoneda" 
+                          formControlName="ddMoneda"
+                        >
+                        <option 
+                            *ngFor="let Moneda of monedas.datos" 
+                            value="{{Moneda.ID_PARAMETRO}}"
+                        > {{Moneda.NOMBRE}} 
+                        </option>
+                        </select>
+                        <span
+                        class="form-text text-danger"
+                        *ngIf="camposValidos('ddMoneda')"
+                        >
+                        Escoja una opción
+                        </span>
+                      </div>
+  
+                      <div class="form-group col-md-12">
+                        <label for="txtMonto" class="form-label">Monto: (*)</label>
+                        <input class="form-control"
+                          id="txtMonto"
+                          formControlName="txtMonto"
+                          type="text" 
+                          placeholder=""
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtMonto')"
+                        >
+                          El valor mínimo es de 3 caracteres
+                        </span>
+                    </div>
+                     
+                      <div class="form-group col-md-12">
+                          <label for="txtFecha" class="form-label">Fecha de Creación (*)</label>
+                          <input class="form-control" 
+                            id="txtFecha" 
+                            formControlName="txtFecha" 
+                            type="date"
+                          >
+                          <span 
+                            class="form-text text-danger"
+                            *ngIf="camposValidos('txtFecha')"
+                          >
+                          Ingrese fecha de nacimiento
+                          </span>
+                      </div>
+  
+                      <div  *ngIf="sucursales" class="form-group col-md-12">
+                        <label for="ddSucursal" class="form-label">Sucursal: (*)</label>
+                        <select class="form-select" 
+                          id="ddSucursal" 
+                          formControlName="ddSucursal"
+                        >
+                        <option 
+                            *ngFor="let Sucursal of sucursales.datos" 
+                            value="{{Sucursal.ID_PARAMETRO}}"
+                        > {{Sucursal.NOMBRE}} 
+                        </option>
+                        </select>
+                        <span
+                        class="form-text text-danger"
+                        *ngIf="camposValidos('ddSucursal')"
+                        >
+                        Escoja una opción
+                        </span>
+                      </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal"><i class="fa fa-fw fa-lg fa-times-circle"></i> Cancelar</button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+          >  
+            <i class="fa fa-fw fa-lg fa-check-circle"></i>Guardar
+          </button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  

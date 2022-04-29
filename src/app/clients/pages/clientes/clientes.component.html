@@ -1,0 +1,265 @@
+<main class="container">
+    <div class="mb-4">
+        <h4>
+            <i class="fas fa-users fa-fw me-3"></i> 
+            Gestión de Clientes
+            <button class="btn btn-primary" type="button" (click)="nuevoCliente()" data-mdb-toggle="modal" data-mdb-target="#exampleModal">
+                <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+        </h4>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+          <div class="tile">
+            <div class="tile-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th>NOMBRES</th>
+                      <th>APELIDO PATERNO</th>
+                      <th>APELLIDO MATERNO</th>
+                      <th>TIPO DE DOCUMENTO</th>
+                      <th>NÚMERO DE DOCUMENTO</th>
+                      <th>FECHA DE NACIMIENTO</th>
+                      <th>GÉNERO</th>
+                      <th>OPCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody *ngIf="clientes">
+                    <tr *ngFor="let cliente of clientes.datos">
+                      <th>{{ cliente.NOMBRES}}</th>
+                      <th>{{ cliente.PATERNO}}</th>
+                      <th>{{ cliente.MATERNO}}</th>
+                      <th>{{ cliente.DOCUMENTO}}</th>
+                      <th>{{ cliente.DOCUMENTO_IDENTIDAD}}</th>
+                      <th>{{ cliente.FECHA_NACIMIENTO | date: 'dd/MM/yyyy'}}</th>
+                      <th>{{ cliente.GENERO}}</th>
+                      <th>
+                        <div class="text-center">
+                            <button class="btn btn-warning btn-sm" (click)="editarCliente(cliente.ID_CLIENTE)" title="Editar" data-mdb-toggle="modal" data-mdb-target="#exampleModal"><i class="fas fa-pencil-alt"></i></button> 
+                            <button class="btn btn-danger btn-sm" (click)="eliminarCliente(cliente.ID_CLIENTE)" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-success btn-sm" (click)="verCuentas(cliente.ID_CLIENTE)" title="Ver Cuentas" data-mdb-toggle="modal" data-mdb-target="#cuentaModal"><i class="fas fa-money-bill"></i></button>
+                        </div>
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <h4 class="text-center" *ngIf="clientes && clientes.datos!.length == 0 "> NO HAY REGISTROS </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form 
+        autocomplete="off" 
+        [formGroup]="miformulario" 
+        class="form-horizontal"
+        (ngSubmit)="guardar()"
+      >
+      <div  class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{tituloModal}}</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+         
+              
+                <input type="hidden" id="txtId" formControlName="txtId" value="">
+                <p class="text-primary">Todos los campos (*) son obligatorios.</p>
+                
+                    <div class="form-group col-md-12">
+                        <label for="txtNombres" class="form-label">Nombres: (*)</label>
+                        <input class="form-control"
+                          id="txtNombres"
+                          formControlName="txtNombres"
+                          type="text" 
+                          placeholder=""
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtNombres')"
+                        >
+                          El valor mínimo es de 3 caracteres
+                        </span>
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        <label for="txtPaterno" class="form-label">Apellido Paterno:</label>
+                        <input class="form-control" 
+                          id="txtPaterno"
+                          formControlName="txtPaterno"
+                          type="text" 
+                          placeholder=""
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtPaterno')"
+                        >
+                          El valor mínimo es de 3 caracteres
+                        </span>
+                    </div>
+                
+                    <div class="form-group col-md-12">
+                        <label for="txtMaterno" class="form-label">Apellido Materno:</label>
+                        <input class="form-control" 
+                          id="txtMaterno" 
+                          formControlName="txtMaterno"
+                          type="text" 
+                          placeholder=""
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtMaterno')"
+                        >
+                          El valor mínimo es de 3 caracteres
+                        </span>
+                    </div>
+
+                    <div  *ngIf="tipoDocumento" class="form-group col-md-12">
+                        <label for="ddDocumento" class="form-label">Tipo de Documento: (*)</label>
+                        <select class="form-select" 
+                          id="ddDocumento" 
+                          formControlName="ddDocumento"
+                        >
+                          <option 
+                            *ngFor="let doc of tipoDocumento.datos" 
+                            value="{{doc.ID_PARAMETRO}}"
+                          > {{doc.NOMBRE}} 
+                          </option>
+                        </select>
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('ddDocumento')"
+                        >
+                          Escoja una opción
+                        </span>
+                    </div>
+                
+                    <div class="form-group col-md-12">
+                        <label for="txtNumDocumento" class="form-label">Número Documento (*)</label>
+                        <input class="form-control" 
+                          id="txtNumDocumento" 
+                          formControlName="txtNumDocumento"
+                          type="text" 
+                          placeholder=""
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtNumDocumento')"
+                        >
+                          Debe ser mayor a 999
+                        </span>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="txtNacimiento" class="form-label">Fecha Nacimiento (*)</label>
+                        <input class="form-control" 
+                          id="txtNacimiento" 
+                          formControlName="txtNacimiento" 
+                          type="date"
+                        >
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('txtNacimiento')"
+                        >
+                        Ingrese fecha de nacimiento
+                        </span>
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        <label for="ddGenero" class="form-label">Género: (*)</label>
+                        <select class="form-select" 
+                          id="ddGenero" 
+                          formControlName="ddGenero"
+                        >
+                          <option value="F">FEMENINO</option>
+                          <option value="M">MASCULINO</option>
+                        </select>
+                        <span 
+                          class="form-text text-danger"
+                          *ngIf="camposValidos('ddGenero')"
+                        >
+                        Escoja una opción
+                      </span>
+                    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal"><i class="fa fa-fw fa-lg fa-times-circle"></i> Cancelar</button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+        >  
+          <i class="fa fa-fw fa-lg fa-check-circle"></i>Guardar
+        </button>
+        <!-- [disabled]="miformulario.invalid" -->
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="cuentaModal" tabindex="-1" aria-labelledby="cuentaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+     
+      <div  class="modal-header">
+        <h5 class="modal-title" id="cuentaModalLabel">CUENTAS DEL CLIENTE</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+         
+        <div class="row">
+          <div class="col-md-12">
+            <div class="tile">
+              <div class="tile-body">
+                <div class="table-responsive">
+                  <table class="table table-hover table-bordered">
+                    <thead>
+                      <tr>
+                        <th>CLIENTE</th>
+                        <th>TIPO DE PRODUCTO</th>
+                        <th>NUMERO DE CUENTA</th>
+                        <th>MONEDA</th>
+                        <th>MONTO</th>
+                        <th>FECHA CREACIÓN</th>
+                        <th>SUCURSAL</th>
+                      </tr>
+                    </thead>
+                    <tbody *ngIf="cuentaCliente">
+                      <tr *ngFor="let cuen of cuentaCliente.datos">
+                        <th>{{ cuen.CLIENTE}}</th>
+                        <th>{{ cuen.PRODUCTO}}</th>
+                        <th>{{ cuen.NUMERO_CUENTA}}</th>
+                        <th>{{ cuen.MONEDA}}</th>
+                        <th>{{ cuen.MONTO}}</th>
+                        <th>{{ cuen.FECHA_CREACION | date: 'dd/MM/yyyy'}}</th>
+                        <th>{{ cuen.SUCURSAL}}</th>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h4 class="text-center" *ngIf="cuentaCliente && cuentaCliente.datos!.length == 0 "> NO TIENE CUENTAS </h4>  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal"><i class="fa fa-fw fa-lg fa-times-circle"></i> Aceptar</button>
+              </div>
+    
+    </div>
+  </div>
+</div>
